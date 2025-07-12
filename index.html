@@ -72,10 +72,14 @@
     </script>
   <script>
     function saveToIndexedDB(key, base64data) {
-      let request = indexedDB.open("UnityGameDB", 1);
+      let request = indexedDB.open("UnityGameDB", 2);
       request.onupgradeneeded = function(event) {
         const db = event.target.result;
-        db.createObjectStore("GameData", { keyPath: "id" });
+
+        if (!db.objectStoreNames.contains("GameData")) {
+          db.createObjectStore("GameData", { keyPath: "id" });
+          console.log("Object store GameData created");
+        }
       };
       request.onsuccess = function(event) {
         const db = event.target.result;
@@ -88,7 +92,7 @@
   </script>
   <script>
     function loadFromDeveloperData(key) {
-      const request = indexedDB.open("UnityGameDB", 1);
+      const request = indexedDB.open("UnityGameDB", 2);
       request.onsuccess = function(event) {
         const db = event.target.result;
         const tx = db.transaction("GameData", "readonly");
@@ -105,7 +109,7 @@
   </script>
   <script>
     function loadFromCustomerData(key) {
-      const request = indexedDB.open("UnityGameDB", 1);
+      const request = indexedDB.open("UnityGameDB", 2);
       request.onsuccess = function(event) {
         const db = event.target.result;
         const tx = db.transaction("GameData", "readonly");
