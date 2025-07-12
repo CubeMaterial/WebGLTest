@@ -67,6 +67,58 @@
         // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
         // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
       });
+      
+      
     </script>
+  <script>
+    function saveToIndexedDB(key, base64data) {
+      let request = indexedDB.open("UnityGameDB", 1);
+      request.onupgradeneeded = function(event) {
+        const db = event.target.result;
+        db.createObjectStore("GameData", { keyPath: "id" });
+      };
+      request.onsuccess = function(event) {
+        const db = event.target.result;
+        const tx = db.transaction("GameData", "readwrite");
+        const store = tx.objectStore("GameData");
+        store.put({ id: key, content: base64data });
+        tx.oncomplete = () => console.log("Saved!");
+      };
+    }
+  </script>
+  <script>
+    function loadFromDeveloperData(key) {
+      const request = indexedDB.open("UnityGameDB", 1);
+      request.onsuccess = function(event) {
+        const db = event.target.result;
+        const tx = db.transaction("GameData", "readonly");
+        const store = tx.objectStore("GameData");
+        const getReq = store.get(key);
+        getReq.onsuccess = function() {
+          const base64 = getReq.result?.content;
+          if (base64)
+            SendMessage("Managers", "OnDataLoadedDeveloperData", base64); // C# 메서드로 전달
+        };
+      };
+    }
+
+  </script>
+  <script>
+    function loadFromCustomerData(key) {
+      const request = indexedDB.open("UnityGameDB", 1);
+      request.onsuccess = function(event) {
+        const db = event.target.result;
+        const tx = db.transaction("GameData", "readonly");
+        const store = tx.objectStore("GameData");
+        const getReq = store.get(key);
+        getReq.onsuccess = function() {
+          const base64 = getReq.result?.content;
+          if (base64)
+            SendMessage("Managers", "OnDataLoadedCustomerData", base64); // C# 메서드로 전달
+        };
+      };
+    }
+
+  </script>
   </body>
 </html>
